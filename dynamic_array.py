@@ -225,9 +225,31 @@ class DynamicArray:
 
     def slice(self, start_index: int, size: int) -> object:
         """
-        TODO: Write this implementation
+        This method returns a new Dynamic Array object that contains the requested number of
+        elements from the original array starting with the element located at the requested start
+        index.
         """
-        pass
+        if start_index < 0 or start_index >= self.size or size<0:
+            raise DynamicArrayException
+
+        if size==0:
+            return DynamicArray([])
+
+        static_slice= StaticArray(size)
+
+        for item in range(size):
+            if self[item+start_index]==None: #catching if there are not enough elements between start and end of requested slice
+                raise DynamicArrayException
+            else:
+                static_slice[item]=self[item+start_index] #building static array
+
+        dynamic_slice = DynamicArray()
+
+        for item in range(static_slice.length()):
+            dynamic_slice.append(static_slice[item])   #populating dynamic array with values in static
+
+        return dynamic_slice
+
 
     def merge(self, second_da: object) -> None:
         """
