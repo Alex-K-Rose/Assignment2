@@ -126,7 +126,7 @@ class DynamicArray:
         if new_capacity < 0 or new_capacity < self.size:
             return
 
-        new_arr = static_array.StaticArray(new_capacity)
+        new_arr = static_array.StaticArray(new_capacity) #static array with larger capacity to base current dynamic array off of
 
         for item in range(self.length()):
             new_arr[item] = self[item]
@@ -141,7 +141,7 @@ class DynamicArray:
         This method adds a new value at the end of the dynamic array.
         If the array is full the capacity is doubled before adding the new value
         """
-        if self.size == self.capacity:
+        if self.size == self.capacity: #double capacity and copy over values from old underlying static array to the new one
 
             new_arr = static_array.StaticArray(self.capacity * 2)
 
@@ -154,7 +154,7 @@ class DynamicArray:
 
             self[self.size - 1] = value
 
-        elif self.is_empty() == True:
+        elif self.is_empty() == True: #if array is empty, add 1 to size and insert at begining of array
             self.size = 1
             self[0] = value
 
@@ -171,16 +171,16 @@ class DynamicArray:
         if index > self.capacity or index < 0:
             raise DynamicArrayException
 
-        if self.size == self.capacity:
+        if self.size == self.capacity: #Double capacity
             self.resize(self.capacity * 2)
 
-        if index<self.size+1:
+        if index<self.size+1:     #add one to size
             self.size += 1
 
         if self[index] != None:
             for num in range(self.size):
-                self[(self.size - 1) - num] = self[((self.size - 2) - num)]
-                if (self.size - 2) - num == index:  # if we are at the index that has now been cleared to add new value leave loop
+                self[(self.size - 1) - num] = self[((self.size - 2) - num)] #every item after index to be inserted is shifted up one
+                if (self.size - 2) - num == index:  # if we are at the index that has now been cleared to add new value, leave loop
                     break
 
         self[index] = value
@@ -189,7 +189,38 @@ class DynamicArray:
         """
         This method removes the element at the specified index from the dynamic array
         """
-        pass
+        if index<0 or index>=self.size:
+            raise DynamicArrayException
+
+        if self.size<(self.capacity/4) and self.capacity>10: #set static array capacity if current size is 1/4th of capacity
+            if (self.size * 2)>=10:
+                new_arr = static_array.StaticArray(self.size * 2)
+
+                for item in range(self.length()):
+                    new_arr[item] = self[item]
+
+                self.data = new_arr
+                self.capacity = self.size * 2
+
+            elif (self.size * 2)<10:
+                new_arr = static_array.StaticArray(10) #if size*2 is less than 10 give new static array capacity 10
+
+                for item in range(self.length()):
+                    new_arr[item] = self[item]
+
+                self.data = new_arr
+                self.capacity = 10
+
+        if index==self.size-1: #if given index is last item in dynamic array
+            self[index]=None
+
+        else:
+            for num in range(self.length()-index):
+                if (num+index) == self.length()-1:  # if we are at the end of the dynamic array leave loop
+                    break
+                self[num+index] = self[num+index+1]
+
+        self.size-=1
 
 
     def slice(self, start_index: int, size: int) -> object:
