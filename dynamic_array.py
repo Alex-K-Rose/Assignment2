@@ -174,7 +174,7 @@ class DynamicArray:
         if self.size == self.capacity:
             self.resize(self.capacity * 2)
 
-        if
+        if index<self.size+1:
             self.size += 1
 
         if self[index] != None:
@@ -187,7 +187,7 @@ class DynamicArray:
 
     def remove_at_index(self, index: int) -> None:
         """
-        TODO: Write this implementation
+        This method removes the element at the specified index from the dynamic array
         """
         pass
 
@@ -314,7 +314,6 @@ if __name__ == "__main__":
             print("Cannot insert value", value, "at index", index)
     print(da)
 
-"""
     print("\n# remove_at_index - example 1")
     da = DynamicArray([10, 20, 30, 40, 50, 60, 70, 80])
     print(da)
@@ -487,4 +486,3 @@ if __name__ == "__main__":
         da.append(case[x])
         mode, frequency = find_mode(da)
         print(f"{da}\nMode: {mode}, Frequency: {frequency}")
-"""
