@@ -286,7 +286,7 @@ class DynamicArray:
         new_arr=DynamicArray()
 
         for item in range(self.length()):
-            if filter_func(self[item])==True:
+            if filter_func(self[item])==True: #apply filter to all values in original array
                 new_arr.append(self[item])
             else:
                 continue
@@ -295,9 +295,23 @@ class DynamicArray:
 
     def reduce(self, reduce_func, initializer=None) -> object:
         """
-        TODO: Write this implementation
+        This method sequentially applies the reduce_func to all elements of the Dynamic Array and
+        returns the resulting value.
         """
-        pass
+        if self.is_empty()==True:
+            return initializer
+
+        if initializer==None:
+            reduction=self[0]
+            for item in range(self.length()-1):
+                reduction+=reduce_func(0, self[item+1])  # apply filter to all values in original array
+
+        else:
+            reduction=initializer
+            for item in range(self.length()):
+                reduction+=reduce_func(0, self[item])  # apply filter to all values in original array
+
+        return reduction
 
 
 def find_mode(arr: DynamicArray) -> (DynamicArray, int):
