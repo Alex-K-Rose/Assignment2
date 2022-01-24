@@ -17,6 +17,7 @@ class DynamicArrayException(Exception):
     """
     pass
 
+
 class DynamicArray:
     def __init__(self, start_array=None):
         """
@@ -264,9 +265,17 @@ class DynamicArray:
 
     def map(self, map_func) -> object:
         """
-        TODO: Write this implementation
+        This method creates a new Dynamic Array where the value of each element is derived by
+        applying a given map_func to the corresponding value from the original array
         """
-        pass
+        new_arr=DynamicArray()
+        new_arr.size=self.size
+        new_arr.capacity=self.capacity
+
+        for item in range(self.length()):
+            new_arr.append(map_func(self[item]))
+
+        return new_arr
 
     def filter(self, filter_func) -> object:
         """
