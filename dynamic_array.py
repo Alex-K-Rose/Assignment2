@@ -253,9 +253,14 @@ class DynamicArray:
 
     def merge(self, second_da: object) -> None:
         """
-        TODO: Write this implementation
+        This method takes another Dynamic Array object as a parameter, and appends all elements
+        from this other array onto the current one.
         """
-        pass
+        if second_da.length()==0:
+            return
+
+        for item in range(second_da.length()):
+            self.append(second_da[item])
 
     def map(self, map_func) -> object:
         """
