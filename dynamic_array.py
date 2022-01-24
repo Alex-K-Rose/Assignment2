@@ -271,17 +271,27 @@ class DynamicArray:
         new_arr=DynamicArray()
         new_arr.size=self.size
         new_arr.capacity=self.capacity
+        new_arr.data= StaticArray(new_arr.capacity) #build out new array with all attributes of passed in array except it is empty
 
         for item in range(self.length()):
-            new_arr.append(map_func(self[item]))
+            new_arr[item]=map_func(self[item])
 
         return new_arr
 
     def filter(self, filter_func) -> object:
         """
-        TODO: Write this implementation
+        This method creates a new Dynamic Array populated only with those elements from the
+        original array for which filter_func returns True.
         """
-        pass
+        new_arr=DynamicArray()
+
+        for item in range(self.length()):
+            if filter_func(self[item])==True:
+                new_arr.append(self[item])
+            else:
+                continue
+
+        return new_arr
 
     def reduce(self, reduce_func, initializer=None) -> object:
         """
