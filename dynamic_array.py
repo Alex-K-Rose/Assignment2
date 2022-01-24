@@ -316,9 +316,110 @@ class DynamicArray:
 
 def find_mode(arr: DynamicArray) -> (DynamicArray, int):
     """
-    TODO: Write this implementation
+    a standalone function outside of the Dynamic Array class that receives a
+    DynamicArray that is sorted in order, either non-descending or non-ascending. The function
+    will return a tuple containing (in this order) a DynamicArray comprising the mode
+    (most-occurring) values in the array, and an integer that represents the highest frequency
+    (how many times they appear)
     """
-    pass
+    second_count = 0  # tracks the number of times a different value that occurs more than once occurs
+    second = 0  # a different value that occurs more than once occurs
+    first = 0  # a value that occurs more than once occurs
+    first_count = 0  # tracks the number of times a value that occurs more than once occurs
+    count_arr=DynamicArray()
+    count_to_beat=0
+
+    for num in range(arr.length()):
+
+        if arr.length() == 1:
+            first_count = 1
+            first = arr[0]
+            break
+
+        if second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
+            count_to_beat=first_count
+            first_count = second_count
+            first = second
+            second_count = 0
+            second = 0
+
+        if num < (arr.length() - 1):  # if not at end of array start tracking multiple occuring numbers
+            if arr[num] == arr[
+                num + 1] and first == 0:  # if current number equals next and first is blank this is the new first
+                first_count = 1
+                first = arr[num]
+
+            elif arr[num] == arr[num + 1] and arr[
+                num] == first:  # if current number equals next and it equals first add to first
+                first_count += 1
+
+            elif arr[num] == arr[num + 1] and arr[
+                num] != first and second == 0:  # if current number equals next but is not first this is new second
+                second_count = 1
+                second = arr[num]
+
+            elif arr[num] == arr[num + 1] and arr[
+                num] == second:  # if current number equals next and it equals second add to second
+                second_count += 1
+
+            elif arr[num] == arr[num + 1] and arr[num] != first and arr[num] != second:
+                second_count = 1  # if current number equals next and it does not equal second or first reset second
+                second = arr[num]
+
+            elif num != 0:
+                if arr[num] == arr[num - 1] and arr[num] != arr[num + 1] and arr[
+                    num] == first:  # if current number equals previous and does not equal next and it equals first add to first
+                    first_count += 1
+                    count_arr.append(first)
+                    count_to_beat=first_count
+
+                elif arr[num] == arr[num - 1] and arr[num] != arr[num + 1] and arr[
+                    num] == second:  # if current number equals previous and does not equal next it equals second add to second
+                    second_count += 1
+                    if second_count==count_to_beat:
+                        count_arr.append(second)
+                        second_count = 0
+                        second = 0
+
+                    elif second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
+                        count_to_beat = second_count
+                        first_count = second_count
+                        first = second
+                        second_count = 0
+                        second = 0
+
+                        for item in range(count_arr.length()):
+                            count_arr.remove_at_index(item)
+
+                        count_arr.append(first)
+        else:  # if at end of array
+            if arr[num] == arr[num - 1] and arr[num] == first:
+                first_count += 1
+                count_arr.append(first)
+
+            elif arr[num] == arr[num - 1] and arr[num] == second:
+                second_count += 1
+
+            if second_count == count_to_beat:
+                count_arr.append(second)
+
+            elif second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
+                count_to_beat = second_count
+                first_count = second_count
+                first = second
+                second_count = 0
+                second = 0
+
+                for item in range(count_arr.length()):
+                    count_arr.remove_at_index(item)
+
+                count_arr.append(first)
+
+    if first_count == 0 and first == 0:  # if original arr is one element long
+        first_count = 1
+        first = arr[0]
+
+    return (count_arr, first_count)
 
 # ------------------- BASIC TESTING -----------------------------------------
 
