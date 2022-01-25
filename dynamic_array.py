@@ -120,22 +120,20 @@ class DynamicArray:
         """
         This method changes the capacity of the underlying storage for the array elements.
         """
-
         if new_capacity==0:
-            return self
+            return
 
         if new_capacity < 0 or new_capacity < self.size:
             return
 
-        new_arr = static_array.StaticArray(new_capacity) #static array with larger capacity to base current dynamic array off of
+        new_arr =StaticArray(new_capacity) #static array with larger capacity to base current dynamic array off of
 
         for item in range(self.length()):
-            new_arr[item] = self[item]
+            new_arr[item] = self.data[item]
 
-        self.data = new_arr
         self.capacity = new_capacity
+        self.data = new_arr
 
-        return self
 
     def append(self, value: object) -> None:
         """
@@ -144,7 +142,7 @@ class DynamicArray:
         """
         if self.size == self.capacity: #double capacity and copy over values from old underlying static array to the new one
 
-            new_arr = static_array.StaticArray(self.capacity * 2)
+            new_arr = StaticArray(self.capacity * 2)
 
             for item in range(self.length()):
                 new_arr[item] = self[item]
@@ -162,8 +160,6 @@ class DynamicArray:
         else:
             self.size += 1
             self[self.size - 1] = value
-
-        return self
 
     def insert_at_index(self, index: int, value: object) -> None:
         """
@@ -195,7 +191,7 @@ class DynamicArray:
 
         if self.size<(self.capacity/4) and self.capacity>10: #set static array capacity if current size is 1/4th of capacity
             if (self.size * 2)>=10:
-                new_arr = static_array.StaticArray(self.size * 2)
+                new_arr = StaticArray(self.size * 2)
 
                 for item in range(self.length()):
                     new_arr[item] = self[item]
@@ -204,7 +200,7 @@ class DynamicArray:
                 self.capacity = self.size * 2
 
             elif (self.size * 2)<10:
-                new_arr = static_array.StaticArray(10) #if size*2 is less than 10 give new static array capacity 10
+                new_arr = StaticArray(10) #if size*2 is less than 10 give new static array capacity 10
 
                 for item in range(self.length()):
                     new_arr[item] = self[item]
@@ -268,13 +264,14 @@ class DynamicArray:
         This method creates a new Dynamic Array where the value of each element is derived by
         applying a given map_func to the corresponding value from the original array
         """
-        new_arr=DynamicArray()
-        new_arr.size=self.size
-        new_arr.capacity=self.capacity
-        new_arr.data= StaticArray(new_arr.capacity) #build out new array with all attributes of passed in array except it is empty
+        new_arr = DynamicArray()
+        new_arr.size = self.size
+        new_arr.capacity = self.capacity
+        new_arr.data = StaticArray(
+            self.capacity)  # build out new array with all attributes of passed in array except it is empty
 
         for item in range(self.length()):
-            new_arr[item]=map_func(self[item])
+            new_arr[item] = map_func(self.data[item])
 
         return new_arr
 
@@ -303,8 +300,8 @@ class DynamicArray:
 
         if initializer==None:
             reduction=self[0]
-            for item in range(self.length()-1):
-                reduction+=reduce_func(0, self[item+1])  # apply filter to all values in original array
+            for item in range(1, (self.length()-2)):
+                reduction+=reduce_func(self[item+1], self[item+2])  # apply filter to all values in original array
 
         else:
             reduction=initializer
