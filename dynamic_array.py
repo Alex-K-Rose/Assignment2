@@ -218,7 +218,15 @@ class DynamicArray:
                 self[num+index] = self[num+index+1]
 
         self.size-=1
+    def clear(self):
+        """Helper method to clear all values from array and set capacity to 4"""
+        new_arr= StaticArray()# if size*2 is less than 10 give new static array capacity 10
 
+        for item in range(self.length()):
+            self.data[item]=None
+        self.size=0
+        self.capacity=4
+        self.data=new_arr
 
     def slice(self, start_index: int, size: int) -> object:
         """
@@ -300,13 +308,13 @@ class DynamicArray:
 
         if initializer==None:
             reduction=self[0]
-            for item in range(1, (self.length()-2)):
-                reduction+=reduce_func(self[item+1], self[item+2])  # apply filter to all values in original array
+            for item in range(1, self.length()):
+                reduction=reduce_func(reduction, self[item])  # apply filter to all values in original array
 
         else:
-            reduction=initializer
-            for item in range(self.length()):
-                reduction+=reduce_func(0, self[item])  # apply filter to all values in original array
+            reduction=reduce_func(initializer, self[0])
+            for item in range(1, self.length()):
+                reduction=reduce_func(reduction, self[item])  # apply filter to all values in original array
 
         return reduction
 
@@ -334,7 +342,7 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
             break
 
         if second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
-            count_to_beat=first_count
+            count_to_beat=second_count
             first_count = second_count
             first = second
             second_count = 0
@@ -343,7 +351,7 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
         if num < (arr.length() - 1):  # if not at end of array start tracking multiple occuring numbers
             if arr[num] == arr[
                 num + 1] and first == 0:  # if current number equals next and first is blank this is the new first
-                first_count = 1
+                first_count += 1
                 first = arr[num]
 
             elif arr[num] == arr[num + 1] and arr[
@@ -352,7 +360,7 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
 
             elif arr[num] == arr[num + 1] and arr[
                 num] != first and second == 0:  # if current number equals next but is not first this is new second
-                second_count = 1
+                second_count += 1
                 second = arr[num]
 
             elif arr[num] == arr[num + 1] and arr[
@@ -385,9 +393,7 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
                         second_count = 0
                         second = 0
 
-                        for item in range(count_arr.length()):
-                            count_arr[item]=None
-                        count_arr.size=0
+                        count_arr.clear()
                         count_arr.append(first)
         else:  # if at end of array
             if arr[num] == arr[num - 1] and arr[num] == first:
@@ -407,8 +413,7 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
                 second_count = 0
                 second = 0
 
-                for item in range(count_arr.length()):
-                    count_arr.remove_at_index(item)
+                count_arr.clear()
 
                 count_arr.append(first)
 
@@ -659,8 +664,8 @@ if __name__ == "__main__":
 
     print("\n# find_mode - example 1")
     test_cases = (
-        [1, 1, 2, 3, 4, 4],
-        [1, 2, 3, 4, 5],
+
+        [686, 0, 0, 0, 0, 0, -223, -869],
         ["Apple", "Banana", "Banana", "Carrot", "Carrot", "Date", "Date", "Date", "Eggplant", "Eggplant", "Eggplant",
          "Fig", "Fig", "Grape"]
     )
