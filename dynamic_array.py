@@ -333,7 +333,7 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
 
         if arr.length() == 1:
             first_count = 1
-            first = arr[0]
+            count_arr.append(first)
             break
 
         if second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
@@ -415,9 +415,10 @@ def find_mode(arr: DynamicArray) -> (DynamicArray, int):
 
                 count_arr.append(first)
 
-    if first_count == 0 and first == 0:  # if original arr is one element long
+    if first_count == 0 and first == 0:  # if original arr is one element long or there are no repeats in string
         first_count = 1
-        first = arr[0]
+        for item in range(arr.length()):
+            count_arr.append(arr[item])
 
     return (count_arr, first_count)
 
