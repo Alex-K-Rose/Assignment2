@@ -7,7 +7,6 @@
 
 from dynamic_array import *
 
-
 class Bag:
     def __init__(self, start_bag=None):
         """
@@ -43,9 +42,9 @@ class Bag:
 
     def add(self, value: object) -> None:
         """
-        TODO: Write this implementation
+        This method adds a new element to the bag
         """
-        pass
+        self.da.append(value)
 
     def remove(self, value: object) -> bool:
         """
