@@ -48,9 +48,16 @@ class Bag:
 
     def remove(self, value: object) -> bool:
         """
-        TODO: Write this implementation
+        This method removes any one element from the bag that matches the provided value
+        object.
         """
-        pass
+        for item in range(self.da.length()):
+            if self.da[item]==value:
+                self.da.remove_at_index(item)
+                return True
+
+        return False
+
 
     def count(self, value: object) -> int:
         """
