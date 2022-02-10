@@ -3,12 +3,10 @@
 # Course: CS261 - Data Structures
 # Assignment: 2
 # Due Date: 1/31/2022
-# Description: The DynamicArray class will use a StaticArray object as its
-# underlying data storage container and will provide many methods similar to those we
-# are used to using when working with Python lists.
-import static_array
-from static_array import *
+# Description: Part 1 of Assignment 2, building out methods of the DynamicArray class which
+# will use a StaticArray object as its underlying data storage container
 
+from static_array import *
 
 class DynamicArrayException(Exception):
     """
@@ -58,7 +56,7 @@ class DynamicArray:
         DO NOT CHANGE THIS METHOD IN ANY WAY
         """
         try:
-            value = self.data[self.index]
+            value = self[self.index]
         except StaticArrayException:
             raise StopIteration
         self.index = self.index + 1
@@ -118,100 +116,313 @@ class DynamicArray:
 
     def resize(self, new_capacity: int) -> None:
         """
-        This method changes the capacity of the underlying storage for the array elements
+        This method changes the capacity of the underlying storage for the array elements.
         """
+        if new_capacity == 0:
+            return
 
         if new_capacity < 0 or new_capacity < self.size:
             return
 
-        elif new_capacity==0 or new_capacity==self.capacity:
-            return self
+        new_arr = StaticArray(new_capacity)  # static array with larger capacity to base current dynamic array off of
 
-        new_size = self.length() + new_capacity  # find how big array needs to be
+        for item in range(self.length()):
+            new_arr[item] = self.data[item]
 
-        self.capacity = new_size  # make array that big
-        self.data = StaticArray(self.capacity)
-
-        return self
+        self.capacity = new_capacity
+        self.data = new_arr
 
     def append(self, value: object) -> None:
         """
         This method adds a new value at the end of the dynamic array.
         If the array is full the capacity is doubled before adding the new value
         """
-        if self.size == self.capacity:
-            new_arr = DynamicArray()
-            new_arr.size = self.length() + 1  # size of original array +1 for value to be appended
-            new_arr.capacity = self.capacity * 2
+        if self.size == self.capacity:  # double capacity and copy over values from old underlying static array to the new one
 
-            for item in range(self.length()): #populate new array with old_array values
+            new_arr = StaticArray(self.capacity * 2)
+
+            for item in range(self.length()):
                 new_arr[item] = self[item]
 
-            new_arr[self.size - 1] = value #find last index of new array
+            self.data = new_arr
+            self.capacity = self.capacity * 2
+            self.size += 1
 
-            self = new_arr
+            self[self.size - 1] = value
 
-        elif self.is_empty() == True: #if first value to be added to array
+        elif self.is_empty() == True:  # if array is empty, add 1 to size and insert at begining of array
             self.size = 1
             self[0] = value
 
-        else:                         #if array has a sufficient capacity and values in it already
+        else:
             self.size += 1
-            self[self.capacity - self.size] = value
-
-        return self
+            self[self.size - 1] = value
 
 
     def insert_at_index(self, index: int, value: object) -> None:
         """
-        This method adds a new value at the specified index position in the dynamic array
+         This method adds a new value at the specified index position in the dynamic array
         """
-        pass
+        if index > self.capacity or index < 0:
+            raise DynamicArrayException
+
+        if self.size == self.capacity:  # Double capacity
+            self.resize(self.capacity * 2)
+
+        if index < self.size + 1:  # add one to size
+            self.size += 1
+
+        if self[index] != None:
+            for num in range(self.size):
+                self[(self.size - 1) - num] = self[
+                    ((self.size - 2) - num)]  # every item after index to be inserted is shifted up one
+                if (
+                        self.size - 2) - num == index:  # if we are at the index that has now been cleared to add new value, leave loop
+                    break
+
+        self[index] = value
 
 
     def remove_at_index(self, index: int) -> None:
         """
-        TODO: Write this implementation
+         This method removes the element at the specified index from the dynamic array
         """
-        pass
+        if index < 0 or index >= self.size:
+            raise DynamicArrayException
 
+        if self.size < (
+                self.capacity / 4) and self.capacity > 10:  # set static array capacity if current size is 1/4th of capacity
+            if (self.size * 2) >= 10:
+                new_arr = StaticArray(self.size * 2)
+
+                for item in range(self.length()):
+                    new_arr[item] = self[item]
+
+                self.data = new_arr
+                self.capacity = self.size * 2
+
+            elif (self.size * 2) < 10:
+                new_arr = StaticArray(10)  # if size*2 is less than 10 give new static array capacity 10
+
+                for item in range(self.length()):
+                    new_arr[item] = self[item]
+
+                self.data = new_arr
+                self.capacity = 10
+
+        if index == self.size - 1:  # if given index is last item in dynamic array
+            self[index] = None
+
+        else:
+            for num in range(self.length() - index):
+                if (num + index) == self.length() - 1:  # if we are at the end of the dynamic array leave loop
+                    break
+                self[num + index] = self[num + index + 1]
+
+        self.size -= 1
+
+    def clear(self):
+        """Helper method to clear all values from array and set capacity to 4"""
+        new_arr = StaticArray()  # if size*2 is less than 10 give new static array capacity 10
+
+        for item in range(self.length()):
+            self.data[item] = None
+        self.size = 0
+        self.capacity = 4
+        self.data = new_arr
 
     def slice(self, start_index: int, size: int) -> object:
         """
-        TODO: Write this implementation
+        This method returns a new Dynamic Array object that contains the requested number of
+        elements from the original array starting with the element located at the requested start
+        index.
         """
-        pass
+        if start_index < 0 or start_index >= self.size or size < 0:
+            raise DynamicArrayException
+
+        if size == 0:
+            return DynamicArray([])
+
+        static_slice = StaticArray(size)
+
+        for item in range(size):
+            if self[item + start_index] == None:  # catching if there are not enough elements between start and end of requested slice
+                raise DynamicArrayException
+            else:
+                static_slice[item] = self[item + start_index]  # building static array
+
+        dynamic_slice = DynamicArray()
+
+        for item in range(static_slice.length()):
+            dynamic_slice.append(static_slice[item])  # populating dynamic array with values in static
+
+        return dynamic_slice
+
 
     def merge(self, second_da: object) -> None:
         """
-        TODO: Write this implementation
+        This method takes another Dynamic Array object as a parameter, and appends all elements
+        from this other array onto the current one.
         """
-        pass
+        if second_da.length() == 0:
+            return
+
+        for item in range(second_da.length()):
+            self.append(second_da[item])
 
     def map(self, map_func) -> object:
         """
-        TODO: Write this implementation
+        This method creates a new Dynamic Array where the value of each element is derived by
+        applying a given map_func to the corresponding value from the original array
         """
-        pass
+        new_arr = DynamicArray()
+        new_arr.size = self.size
+        new_arr.capacity = self.capacity
+        new_arr.data = StaticArray(self.capacity)  # build out new array with all attributes of passed in array except it is empty
+
+        for item in range(self.length()):
+            new_arr[item]=map_func(self.data[item])
+
+        return new_arr
+
 
     def filter(self, filter_func) -> object:
         """
-        TODO: Write this implementation
+        This method creates a new Dynamic Array populated only with those elements from the
+        original array for which filter_func returns True.
         """
-        pass
+        new_arr = DynamicArray()
+
+        for item in range(self.length()):
+            if filter_func(self[item]) == True:  # apply filter to all values in original array
+                new_arr.append(self[item])
+            else:
+                continue
+
+        return new_arr
 
     def reduce(self, reduce_func, initializer=None) -> object:
         """
-        TODO: Write this implementation
+        This method sequentially applies the reduce_func to all elements of the Dynamic Array and
+        returns the resulting value.
         """
-        pass
+        if self.is_empty() == True:
+            return initializer
+
+        if initializer == None:
+            reduction = self[0]
+            for item in range(1, self.length()):
+                reduction = reduce_func(reduction, self[item])  # apply filter to all values in original array
+
+        else:
+            reduction = reduce_func(initializer, self[0])
+            for item in range(1, self.length()):
+                reduction = reduce_func(reduction, self[item])  # apply filter to all values in original array
+
+        return reduction
 
 
 def find_mode(arr: DynamicArray) -> (DynamicArray, int):
     """
-    TODO: Write this implementation
+    A standalone function outside of the Dynamic Array class that receives a
+    DynamicArray that is sorted in order, either non-descending or non-ascending. The function
+    will return a tuple containing (in this order) a DynamicArray comprising the mode
+    (most-occurring) values in the array, and an integer that represents the highest frequency
+    (how many times they appear)
     """
-    pass
+    second_count = 0  # tracks the number of times a different value that occurs more than once occurs
+    second = 0  # a different value that occurs more than once occurs
+    first = 0  # a value that occurs more than once occurs
+    first_count = 0  # tracks the number of times a value that occurs more than once occurs
+    count_arr = DynamicArray()
+    count_to_beat = 0
+
+    if arr.length() == 1:
+        first_count = 1
+        count_arr.append(arr[0])
+        return (count_arr, first_count)
+
+    for num in range(arr.length()):
+
+        if num < (arr.length() - 1):  # if not at end of array start tracking multiple occuring numbers
+            if arr[num] == arr[
+                num + 1] and first == 0:  # if current number equals next and first is blank this is the new first
+                first_count += 1
+                first = arr[num]
+
+            elif arr[num] == arr[num + 1] and arr[
+                num] == first:  # if current number equals next and it equals first add to first
+                first_count += 1
+
+            elif arr[num] == arr[num + 1] and arr[
+                num] != first and second == 0:  # if current number equals next but is not first this is new second
+                second_count += 1
+                second = arr[num]
+
+            elif arr[num] == arr[num + 1] and arr[
+                num] == second:  # if current number equals next and it equals second add to second
+                second_count += 1
+
+            elif num != 0:
+                if arr[num] == arr[num - 1] and arr[num] != arr[num + 1] and arr[
+                    num] == first:  # if current number equals previous and does not equal next and it equals first add to first
+                    first_count += 1
+                    count_arr.append(first)
+                    count_to_beat = first_count
+
+                elif arr[num] == arr[num - 1] and arr[num] != arr[num + 1] and arr[
+                    num] == second:  # if current number equals previous and does not equal next it equals second add to second
+
+                    second_count += 1
+
+                    if second_count == count_to_beat:
+                        count_arr.append(second)
+                        second_count = 0
+                        second = 0
+
+                    elif second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
+                        count_to_beat = second_count
+                        first_count = second_count
+                        first = second
+                        second_count = 0
+                        second = 0
+
+                        count_arr.clear()
+                        count_arr.append(first)
+
+                    else:        #if number of second multiple occuring value is not greater than or equal to first, reset
+                        second_count = 0
+                        second = 0
+
+        else:  # if at end of array
+            if arr[num] == arr[num - 1] and arr[num] == first:
+                first_count += 1
+                count_arr.append(first)
+
+            elif arr[num] == arr[num - 1] and arr[num] == second:
+                second_count += 1
+
+            if second_count == count_to_beat and count_to_beat != 0:
+                count_arr.append(second)
+
+            elif second_count > first_count:  # if number of second multiple occuring value surpasses first, switch and reset second
+                count_to_beat = second_count
+                first_count = second_count
+                first = second
+                second_count = 0
+                second = 0
+
+                count_arr.clear()
+
+                count_arr.append(first)
+
+    if first_count == 0 and first == 0:  # if original arr is one element long or there are no repeats in string
+        first_count = 1
+        for item in range(arr.length()):
+            count_arr.append(arr[item])
+
+    return (count_arr, first_count)
+
 
 # ------------------- BASIC TESTING -----------------------------------------
 
@@ -456,8 +667,7 @@ if __name__ == "__main__":
     test_cases = (
         [1, 1, 2, 3, 4, 4],
         [1, 2, 3, 4, 5],
-        ["Apple", "Banana", "Banana", "Carrot", "Carrot", "Date", "Date", "Date", "Eggplant", "Eggplant", "Eggplant",
-         "Fig", "Fig", "Grape"]
+        [686, 0, 0, 0, 0, 0, -223, -869]
     )
 
     for case in test_cases:
